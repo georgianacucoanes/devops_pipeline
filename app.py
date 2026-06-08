@@ -2,8 +2,21 @@ from flask import Flask, jsonify,request
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+import logging
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
 app = Flask(__name__)
 app.secret_key=os.getenv("APP_SECRET","default-secret")
 
