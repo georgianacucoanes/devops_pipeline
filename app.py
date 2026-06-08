@@ -1,7 +1,7 @@
-from flask import Flask, jsonify, request
 from datetime import datetime
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, jsonify, request, render_template
 import os
 import logging
 
@@ -46,6 +46,10 @@ with app.app_context():
 def home():
     logger.info("Home endpoint called")
     return jsonify({"message": "Hello from DevOps pipeline!", "status": "ok"})
+
+@app.route("/ui")
+def ui():
+    return render_template("index.html")
 
 @app.route("/health")
 def health():

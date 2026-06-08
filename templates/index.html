@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; padding: 40px; }
+        h1 { text-align: center; margin-bottom: 30px; color: #e94560; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .add-task { display: flex; gap: 10px; margin-bottom: 30px; }
+        input { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #16213e; color: #eee; font-size: 16px; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn-add { background: #e94560; color: white; }
+        .btn-add:hover { background: #c73652; }
+        .task-list { list-style: none; }
+        .task-item { background: #16213e; padding: 15px 20px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+        .task-item.done span { text-decoration: line-through; color: #888; }
+        .task-item span { flex: 1; font-size: 16px; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .pending { background: #f0a500; color: #000; }
+        .done { background: #2ecc71; color: #000; }
+        .btn-done { background: #2ecc71; color: #000; padding: 8px 14px; font-size: 13px; }
+        .btn-delete { background: #e94560; color: white; padding: 8px 14px; font-size: 13px; }
+        .empty { text-align: center; color: #888; margin-top: 40px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <div class="add-task">
+            <input type="text" id="taskInput" placeholder="Add a new task..." onkeypress="if(event.key==='Enter') addTask()">
+            <button class="btn-add" onclick="addTask()">Add</button>
+        </div>
+        <ul class="task-list" id="taskList"></ul>
+        <p class="empty" id="emptyMsg" style="display:none">No tasks yet. Add one above!</p>
+    </div>
+
+    <script>
+        async function loadTasks() {
+            const res = await fetch('/tasks');
+            const data = await res.json();
+            renderTasks(data.tasks);
+        }
+
+        function renderTasks(tasks) {
+            const list = document.getElementById('taskList');
+            const empty = document.getElementById('emptyMsg');
+            list.innerHTML = '';
+            if (tasks.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.status}`;
+                li.innerHTML = `
+                    <span>${task.task}</span>
+                    <span class="status-badge ${task.status}">${task.status}</span>
+                    ${task.status === 'pending' ? `<button class="btn-done" onclick="markDone(${task.id})">Done</button>` : ''}
+                    <button class="btn-delete" onclick="deleteTask(${task.id})">Delete</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const task = input.value.trim();
+            if (!task) return;
+            await fetch('/tasks', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({task})
+            });
+            input.value = '';
+            loadTasks();
+        }
+
+        async function markDone(id) {
+            await fetch(`/tasks/${id}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({status: 'done'})
+            });
+            loadTasks();
+        }
+
+        async function deleteTask(id) {
+            await fetch(`/tasks/${id}`, {method: 'DELETE'});
+            loadTasks();
+        }
+
+        loadTasks();
+    </script>
+</body>
+</html>
