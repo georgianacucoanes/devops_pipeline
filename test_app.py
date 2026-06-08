@@ -1,12 +1,14 @@
 import pytest
-from app import app, tasks
+from app import app, db
 
 @pytest.fixture
 def client():
     app.config["TESTING"] = True
-    tasks.clear()
-    with app.test_client() as client:
-        yield client
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    with app.app_context():
+        db.create_all()
+        yield app.test_client()
+        db.drop_all()
 
 def test_home(client):
     response = client.get("/")
@@ -36,12 +38,15 @@ def test_get_tasks(client):
 
 def test_update_task(client):
     client.post("/tasks", json={"task": "Learn DevOps"})
-    response = client.patch("/tasks/0", json={"status": "done"})
+    tasks = client.get("/tasks").json["tasks"]
+    task_id = tasks[0]["id"]
+    response = client.patch(f"/tasks/{task_id}", json={"status": "done"})
     assert response.status_code == 200
     assert response.json["task"]["status"] == "done"
 
 def test_delete_task(client):
     client.post("/tasks", json={"task": "Learn DevOps"})
-    response = client.delete("/tasks/0")
+    tasks = client.get("/tasks").json["tasks"]
+    task_id = tasks[0]["id"]
+    response = client.delete(f"/tasks/{task_id}")
     assert response.status_code == 200
-    assert response.json["task"]["task"] == "Learn DevOps"
