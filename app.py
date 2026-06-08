@@ -1,8 +1,16 @@
 from flask import Flask, jsonify,request
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 app = Flask(__name__)
+app.secret_key=os.getenv("APP_SECRET","default-secret")
+
 tasks=[]
+
+PORT=int(os.getenv("FLASK_PORT",5000))
+DEBUG=os.getenv("FLASK_DEBUG","False")=="True"
 
 @app.route("/")
 def home():
