@@ -1,19 +1,4 @@
-# devops_pipeline
-Think of a flask application as a restaurant : 
-
-flask app= the kitchen 
-endpoint= the serving window(each window serves something different)
-request=your order
-response=what you get back
-
-Every time you type a URL in your browser , you re making a request to a specific endpoint, and the server sends back a response.
-
-Each @app.route(...) in the code defines one of those windows:
-/   -> "Hello, the server is running"
-/health  ->"Yes, I'm up an healthy"
-/time -> "Current time iss 14:32:05"
-/tasks -> "Here are your tasks" (GET) or "Task added!"(Post) . The difference between get and post is that get is used when you re asking for something and post is used when you're senfing something
-# DevOps CI/CD Pipeline
+# Flask Docker Pipeline
 
 A Flask REST API with a fully automated CI/CD pipeline using GitHub Actions and Docker.
 
@@ -33,20 +18,26 @@ Every time code is pushed to the `main` branch, the pipeline automatically:
 | GET | `/time` | Returns current server time |
 | GET | `/tasks` | Returns all tasks |
 | POST | `/tasks` | Adds a new task |
+| PATCH | `/tasks/<id>` | Updates task status |
+| DELETE | `/tasks/<id>` | Deletes a task |
+| GET | `/ui` | Frontend interface |
 
 ## Tech Stack
 
-- **Python** / **Flask** — REST API
+- **Python / Flask** — REST API
+- **PostgreSQL / Supabase** — cloud database
+- **SQLAlchemy** — ORM
 - **Docker** — containerization
 - **GitHub Actions** — CI/CD pipeline
 - **Docker Hub** — image registry
 - **pytest** — automated testing
+- **python-dotenv** — environment variables
 
 ## Run locally
 
 ```bash
-git clone https://github.com/georgianacucoanes/devops-pipeline.git
-cd devops-pipeline
+git clone https://github.com/georgianacucoanes/flask-docker-pipeline.git
+cd flask-docker-pipeline
 pip install -r requirements.txt
 python app.py
 ```
@@ -60,4 +51,4 @@ docker run -p 5000:5000 georgianacucoanes/devops-pipeline
 
 ## Pipeline status
 
-![CI/CD](https://github.com/georgianacucoanes/devops-pipeline/actions/workflows/ci-cd.yml/badge.svg)
+![CI/CD](https://github.com/georgianacucoanes/flask-docker-pipeline/actions/workflows/ci-cd.yml/badge.svg)
