@@ -60,4 +60,4 @@ docker run -p 5000:5000 georgianacucoanes/devops-pipeline
 
 ## Pipeline status
 
-![CI/CD](https://github.com/georgianacucoanes/devops-pipeline/actions/workflows/ci-cd.yml/badge.svg)
+![CI/CD](https://github.com/georgianacucoanes/flask-docker-pipeline/actions/workflows/ci-cd.yml/badge.svg)
